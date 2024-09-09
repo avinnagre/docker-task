@@ -1,0 +1,41 @@
+version: '3'
+services:
+  docker-task-mysql:
+    build: ./docker-task-mysql
+    container_name: docker-task-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydatabase
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+  docker-task-server:
+    build: ./docker-task-server
+    container_name: docker-task-server
+    depends_on:
+      - docker-task-mysql
+    ports:
+      - "5000:5000"
+    networks:
+    - app-network
+
+  docker-task-ui:
+    build: ./docker-task-ui
+    container_name: docker-task-ui
+    ports:
+      - "5173:5173"
+    depends_on:
+      - docker-task-server
+    networks:
+    - app-network
+
+networks:
+  app-network:
+    driver: bridge
+    
+volumes:
+  db-data:
